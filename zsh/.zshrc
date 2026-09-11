@@ -23,6 +23,25 @@ alias la='eza -a --group-directories-first --icons=auto'
 alias l='eza --group-directories-first --icons=auto'
 alias gs='git status'
 
+#Searching in dotfiles command-line
+dotfiles() {
+  local file
+
+  file=$(
+    fd \
+      --type f \
+      --hidden \
+      --exclude .git \
+      . "$HOME/dotfiles" |
+    fzf \
+      --prompt="DOTFILES > " \
+      --border \
+      --reverse
+  )
+
+  [[ -n "$file" ]] && nvim "$file"
+}
+
 # fzf
 [ -f /usr/share/fzf/shell/key-bindings.zsh ] && source /usr/share/fzf/shell/key-bindings.zsh
 [ -f /usr/share/fzf/shell/completion.zsh ] && source /usr/share/fzf/shell/completion.zsh
