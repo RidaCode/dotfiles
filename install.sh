@@ -16,6 +16,7 @@ sudo dnf install -y \
   ripgrep \
   fzf \
   zoxide \
+  eza \
   wl-clipboard \
   fd-find \
   curl \

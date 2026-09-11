@@ -15,9 +15,12 @@ compinit
 bindkey -e
 
 # Useful aliases
-alias ll='ls -lah'
-alias la='ls -A'
-alias l='ls -CF'
+# alias ll='ls -lah'
+# alias la='ls -A'
+# alias l='ls -CF'
+alias ll='eza -lah --group-directories-first --icons=auto'
+alias la='eza -a --group-directories-first --icons=auto'
+alias l='eza --group-directories-first --icons=auto'
 alias gs='git status'
 
 # fzf
