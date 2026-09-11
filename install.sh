@@ -49,6 +49,7 @@ stow --restow git
 stow --restow tmux
 stow --restow nvim
 stow --restow starship
+stow --restow power
 
 # ==================================================
 # ZSH
@@ -83,6 +84,15 @@ fi
 echo "==> Installing tmux plugins"
 
 "$TPM/bin/install_plugins"
+
+# ==================================================
+# POWER / DISPLAY LOCK SERVICE
+# ==================================================
+
+echo "==> Enabling lock display power-off service"
+
+systemctl --user daemon-reload
+systemctl --user enable --now lock-dpms-off.service
 
 # ==================================================
 # DONE
