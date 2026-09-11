@@ -29,7 +29,7 @@ alias gs='git status'
 
 # zoxide
 eval "$(zoxide init zsh)"
-# eval "$(starship init zsh)"
+eval "$(starship init zsh)"
 
 source /usr/share/zsh-autosuggestions/zsh-autosuggestions.zsh
 source /usr/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
@@ -37,5 +37,5 @@ source /usr/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 autoload -Uz colors
 colors
 
-PROMPT='%F{cyan}%~%f
-%F{green}❯%f '
+# PROMPT='%F{cyan}%~%f
+# %F{green}❯%f '
