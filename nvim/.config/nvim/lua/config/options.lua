@@ -7,3 +7,5 @@ vim.diagnostic.config({
     current_line = true,
   },
 })
+
+vim.g.snacks_animate = false
