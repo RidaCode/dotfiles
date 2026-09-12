@@ -10,11 +10,6 @@ My Fedora development environment.
 - Neovim / LazyVim
 - Starship
 
-- Power management helper
-  - Never suspends automatically
-  - Turns the display off when the session locks
-  - Used with KDE lid-close action set to `Lock screen`
-
 ## What the installer does
 
 `install.sh` will:
