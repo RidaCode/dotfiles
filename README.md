@@ -7,7 +7,7 @@ My Fedora development environment.
 - Zsh
 - Git
 - tmux
-- Neovim / LazyVim
+- Neovim 
 - Starship
 
 ## What the installer does
