@@ -10,6 +10,7 @@ setopt AUTO_CD
 # Completion
 autoload -Uz compinit
 compinit
+zstyle ':completion:*' matcher-list 'm:{a-zA-Z}={A-Za-z}'
 
 # Better command-line editing
 bindkey -e
