@@ -573,6 +573,22 @@ do
   vim.keymap.set('n', '<leader>sc', builtin.commands, { desc = '[S]earch [C]ommands' })
   vim.keymap.set('n', '<leader><leader>', builtin.buffers, { desc = '[ ] Find existing buffers' })
 
+
+-- Grep Search dotfiles
+vim.keymap.set('n', '<leader>sD', function()
+  builtin.live_grep {
+    cwd = vim.fn.expand '~/dotfiles',
+    additional_args = function()
+      return {
+         '--hidden',
+    '--follow',
+    '--glob',
+    '!.git/*',
+      }
+    end,
+  }
+end, { desc = '[S]earch [D]otfiles' })
+
   -- Add Telescope-based LSP pickers when an LSP attaches to a buffer.
   -- If you later switch picker plugins, this is where to update these mappings.
   vim.api.nvim_create_autocmd('LspAttach', {
