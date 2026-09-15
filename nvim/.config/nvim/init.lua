@@ -253,6 +253,15 @@ do
   })
 end
 
+  -- Show absolute and relative line numbers in help buffers.
+  vim.api.nvim_create_autocmd("FileType", {
+    pattern = "help",
+    callback = function()
+      vim.opt_local.number = true
+      vim.opt_local.relativenumber = true
+    end,
+  })
+
 -- ============================================================
 -- SECTION 3: PLUGIN MANAGER INTRO
 -- vim.pack intro, build hooks
