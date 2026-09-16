@@ -679,13 +679,15 @@ require('hlslens').setup {
 local hlslens = require 'hlslens'
 
 vim.keymap.set('n', 'n', function()
-  vim.cmd('normal! ' .. vim.v.count1 .. 'n')
-  hlslens.start()
+  local ok = pcall(function() vim.cmd('normal! ' .. vim.v.count1 .. 'n') end)
+
+  if ok then hlslens.start() end
 end)
 
 vim.keymap.set('n', 'N', function()
-  vim.cmd('normal! ' .. vim.v.count1 .. 'N')
-  hlslens.start()
+  local ok = pcall(function() vim.cmd('normal! ' .. vim.v.count1 .. 'N') end)
+
+  if ok then hlslens.start() end
 end)
 
 vim.keymap.set('n', '*', function()
