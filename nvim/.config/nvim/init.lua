@@ -437,6 +437,7 @@ do
       { '<leader>s', group = '[S]earch', mode = { 'n', 'v' } },
       { '<leader>t', group = '[T]oggle' },
       { '<leader>h', group = 'Git [H]unk', mode = { 'n', 'v' } }, -- Enable gitsigns recommended keymaps first
+      { '<leader>d', group = '[D]ebug' },
       { 'gr', group = 'LSP Actions', mode = { 'n' } },
     },
   }
@@ -1242,6 +1243,119 @@ do
   -- require 'custom.plugins.colorscheme'
   -- require 'custom.plugins.ui'
   -- require 'custom.plugins.git'
+end
+
+-- ============================================================
+-- SECTION 11: DEBUGGING
+-- nvim-dap, GDB, debugger UI
+-- ============================================================
+do
+  vim.pack.add {
+    gh 'mfussenegger/nvim-dap',
+    gh 'nvim-neotest/nvim-nio',
+    gh 'rcarriga/nvim-dap-ui',
+    gh 'theHamsta/nvim-dap-virtual-text',
+  }
+
+  local dap = require 'dap'
+  local dapui = require 'dapui'
+
+  dapui.setup {}
+
+  require('nvim-dap-virtual-text').setup {}
+
+  -- GDB provides a native Debug Adapter Protocol implementation.
+  dap.adapters.gdb = {
+    type = 'executable',
+    command = 'gdb',
+    args = {
+      '--interpreter=dap',
+      '--eval-command',
+      'set print pretty on',
+    },
+  }
+
+  local cpp_configurations = {
+    {
+      name = 'Launch executable',
+      type = 'gdb',
+      request = 'launch',
+
+      program = function() return vim.fn.input('Path to executable: ', vim.fn.getcwd() .. '/', 'file') end,
+
+      cwd = '${workspaceFolder}',
+      stopAtBeginningOfMainSubprogram = false,
+    },
+
+    {
+      name = 'Attach to process',
+      type = 'gdb',
+      request = 'attach',
+
+      program = function() return vim.fn.input('Path to executable: ', vim.fn.getcwd() .. '/', 'file') end,
+
+      pid = function() return require('dap.utils').pick_process() end,
+
+      cwd = '${workspaceFolder}',
+    },
+  }
+
+  dap.configurations.cpp = cpp_configurations
+  dap.configurations.c = cpp_configurations
+
+  -- Automatically show the debugger UI while debugging.
+  dap.listeners.before.attach.dapui_config = function() dapui.open() end
+
+  dap.listeners.before.launch.dapui_config = function() dapui.open() end
+
+  dap.listeners.before.event_terminated.dapui_config = function() dapui.close() end
+
+  dap.listeners.before.event_exited.dapui_config = function() dapui.close() end
+
+  -- Debugger keymaps.
+  vim.keymap.set('n', '<leader>db', dap.toggle_breakpoint, {
+    desc = '[D]ebug [B]reakpoint',
+  })
+
+  vim.keymap.set('n', '<leader>dB', function() dap.set_breakpoint(vim.fn.input 'Breakpoint condition: ') end, {
+    desc = '[D]ebug conditional [B]reakpoint',
+  })
+
+  vim.keymap.set('n', '<leader>dc', dap.continue, {
+    desc = '[D]ebug [C]ontinue',
+  })
+
+  vim.keymap.set('n', '<leader>dn', dap.step_over, {
+    desc = '[D]ebug [N]ext / step over',
+  })
+
+  vim.keymap.set('n', '<leader>di', dap.step_into, {
+    desc = '[D]ebug step [I]nto',
+  })
+
+  vim.keymap.set('n', '<leader>do', dap.step_out, {
+    desc = '[D]ebug step [O]ut',
+  })
+
+  vim.keymap.set('n', '<leader>dt', dap.terminate, {
+    desc = '[D]ebug [T]erminate',
+  })
+
+  vim.keymap.set('n', '<leader>dr', dap.repl.open, {
+    desc = '[D]ebug [R]EPL',
+  })
+
+  vim.keymap.set('n', '<leader>dl', dap.run_last, {
+    desc = '[D]ebug run [L]ast',
+  })
+
+  vim.keymap.set('n', '<leader>du', dapui.toggle, {
+    desc = '[D]ebug [U]I',
+  })
+
+  vim.keymap.set({ 'n', 'v' }, '<leader>de', dapui.eval, {
+    desc = '[D]ebug [E]valuate',
+  })
 end
 
 -- The line beneath this is called `modeline`. See `:help modeline`

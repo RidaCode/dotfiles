@@ -57,5 +57,8 @@ source /usr/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 autoload -Uz colors
 colors
 
+# Make CMake always generate clangd's database
+export CMAKE_EXPORT_COMPILE_COMMANDS=ON
+
 # PROMPT='%F{cyan}%~%f
 # %F{green}❯%f '
