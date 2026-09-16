@@ -194,7 +194,7 @@ do
     underline = { severity = { min = vim.diagnostic.severity.WARN } },
 
     -- Can switch between these as you prefer
-    virtual_text = true, -- Text shows up at the end of the line
+    virtual_text = false, -- Text shows up at the end of the line
     virtual_lines = false, -- Text shows up underneath the line, with virtual lines
 
     -- Auto open the float, so you can easily read the errors when jumping with `[d` and `]d`
@@ -482,6 +482,9 @@ do
   -- - sr)'  - [S]urround [R]eplace [)] [']
   require('mini.surround').setup()
 
+  -- Add better jumping capabilities with f, it repeats
+  require('mini.jump').setup()
+
   -- Simple and easy statusline.
   --  You could remove this setup call if you don't like it,
   --  and try some other statusline plugin
@@ -649,6 +652,47 @@ do
   vim.keymap.set('n', '<leader>sn', function() builtin.find_files { cwd = vim.fn.stdpath 'config', follow = true } end, { desc = '[S]earch [N]eovim files' })
 end
 
+-- Better search result visibility.
+vim.pack.add {
+  gh 'kevinhwang91/nvim-hlslens',
+}
+
+require('hlslens').setup {
+  calm_down = true,
+}
+
+local hlslens = require 'hlslens'
+
+vim.keymap.set('n', 'n', function()
+  vim.cmd('normal! ' .. vim.v.count1 .. 'n')
+  hlslens.start()
+end)
+
+vim.keymap.set('n', 'N', function()
+  vim.cmd('normal! ' .. vim.v.count1 .. 'N')
+  hlslens.start()
+end)
+
+vim.keymap.set('n', '*', function()
+  vim.cmd 'normal! *'
+  hlslens.start()
+end)
+
+vim.keymap.set('n', '#', function()
+  vim.cmd 'normal! #'
+  hlslens.start()
+end)
+
+vim.keymap.set('n', 'g*', function()
+  vim.cmd 'normal! g*'
+  hlslens.start()
+end)
+
+vim.keymap.set('n', 'g#', function()
+  vim.cmd 'normal! g#'
+  hlslens.start()
+end)
+
 -- ============================================================
 -- SECTION 6: LSP
 -- LSP keymaps, server configuration, Mason tools installations
@@ -752,6 +796,11 @@ do
     end,
   })
 
+  -- Schema definitions for JSON and YAML language servers.
+  vim.pack.add {
+    gh 'b0o/SchemaStore.nvim',
+  }
+
   -- Enable the following language servers
   --  Feel free to add/remove any LSPs that you want here. They will automatically be installed.
   --  See `:help lsp-config` for information about keys and how to configure
@@ -774,8 +823,27 @@ do
     cssls = {},
 
     -- Data / config formats
-    jsonls = {},
-    yamlls = {},
+    jsonls = {
+      settings = {
+        json = {
+          schemas = require('schemastore').json.schemas(),
+          validate = { enable = true },
+        },
+      },
+    },
+
+    yamlls = {
+      settings = {
+        yaml = {
+          schemaStore = {
+            enable = false,
+            url = '',
+          },
+          schemas = require('schemastore').yaml.schemas(),
+        },
+      },
+    },
+
     taplo = {}, -- TOML
 
     -- Documentation
@@ -882,6 +950,51 @@ do
   end
 end
 
+-- Better UI and previews for LSP code actions.
+vim.pack.add {
+  gh 'rachartier/tiny-code-action.nvim',
+}
+
+require('tiny-code-action').setup {
+  backend = 'vim',
+
+  picker = {
+    'buffer',
+    opts = {
+      hotkeys = true,
+      hotkeys_mode = 'text_diff_based',
+      auto_preview = false,
+      auto_accept = false,
+      position = 'cursor',
+      keymaps = {
+        preview = 'K',
+        close = { 'q', '<Esc>' },
+        select = '<CR>',
+        preview_close = { 'q', '<Esc>' },
+      },
+    },
+  },
+}
+
+vim.keymap.set({ 'n', 'x' }, '<leader>ca', function() require('tiny-code-action').code_action() end, {
+  desc = '[C]ode [A]ction',
+})
+
+-- Better inline diagnostic display.
+vim.pack.add {
+  gh 'rachartier/tiny-inline-diagnostic.nvim',
+}
+
+require('tiny-inline-diagnostic').setup {
+  preset = 'simple',
+  transparent_cursorline = false,
+  options = {
+    multilines = {
+      enabled = true,
+    },
+  },
+}
+
 -- ============================================================
 -- SECTION 7: FORMATTING
 -- conform.nvim setup and keymap
@@ -970,43 +1083,21 @@ do
   vim.pack.add { { src = gh 'saghen/blink.cmp', version = vim.version.range '1.*' } }
   require('blink.cmp').setup {
     keymap = {
-      -- 'default' (recommended) for mappings similar to built-in completions
-      --   <c-y> to accept ([y]es) the completion.
-      --    This will auto-import if your LSP supports it.
-      --    This will expand snippets if the LSP sent a snippet.
-      -- 'super-tab' for tab to accept
-      -- 'enter' for enter to accept
-      -- 'none' for no mappings
-      --
-      -- For an understanding of why the 'default' preset is recommended,
-      -- you will need to read `:help ins-completion`
-      --
-      -- No, but seriously. Please read `:help ins-completion`, it is really good!
-      --
-      -- All presets have the following mappings:
-      -- <tab>/<s-tab>: move to right/left of your snippet expansion
-      -- <c-space>: Open menu or open docs if already open
-      -- <c-n>/<c-p> or <up>/<down>: Select next/previous item
-      -- <c-e>: Hide menu
-      -- <c-k>: Toggle signature help
-      --
-      -- See `:help blink-cmp-config-keymap` for defining your own keymap
-      preset = 'default',
+      preset = 'enter',
 
-      -- For more advanced Luasnip keymaps (e.g. selecting choice nodes, expansion) see:
-      --    https://github.com/L3MON4D3/LuaSnip?tab=readme-ov-file#keymaps
+      ['<Tab>'] = { 'select_next', 'snippet_forward', 'fallback' },
+      ['<S-Tab>'] = { 'select_prev', 'snippet_backward', 'fallback' },
     },
 
     appearance = {
-      -- 'mono' (default) for 'Nerd Font Mono' or 'normal' for 'Nerd Font'
-      -- Adjusts spacing to ensure icons are aligned
       nerd_font_variant = 'mono',
     },
 
     completion = {
-      -- By default, you may press `<c-space>` to show the documentation.
-      -- Optionally, set `auto_show = true` to show the documentation after a delay.
-      documentation = { auto_show = false, auto_show_delay_ms = 500 },
+      documentation = {
+        auto_show = true,
+        auto_show_delay_ms = 200,
+      },
     },
 
     sources = {
@@ -1015,16 +1106,8 @@ do
 
     snippets = { preset = 'luasnip' },
 
-    -- Blink.cmp includes an optional, recommended rust fuzzy matcher,
-    -- which automatically downloads a prebuilt binary when enabled.
-    --
-    -- By default, we use the Lua implementation instead, but you may enable
-    -- the rust implementation via `'prefer_rust_with_warning'`
-    --
-    -- See `:help blink-cmp-config-fuzzy` for more information
     fuzzy = { implementation = 'lua' },
 
-    -- Shows a signature help window while you type arguments for a function
     signature = { enabled = true },
   }
 end
