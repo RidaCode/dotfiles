@@ -253,14 +253,14 @@ do
   })
 end
 
-  -- Show absolute and relative line numbers in help buffers.
-  vim.api.nvim_create_autocmd("FileType", {
-    pattern = "help",
-    callback = function()
-      vim.opt_local.number = true
-      vim.opt_local.relativenumber = true
-    end,
-  })
+-- Show absolute and relative line numbers in help buffers.
+vim.api.nvim_create_autocmd('FileType', {
+  pattern = 'help',
+  callback = function()
+    vim.opt_local.number = true
+    vim.opt_local.relativenumber = true
+  end,
+})
 
 -- ============================================================
 -- SECTION 3: PLUGIN MANAGER INTRO
@@ -573,21 +573,20 @@ do
   vim.keymap.set('n', '<leader>sc', builtin.commands, { desc = '[S]earch [C]ommands' })
   vim.keymap.set('n', '<leader><leader>', builtin.buffers, { desc = '[ ] Find existing buffers' })
 
-
--- Grep Search dotfiles
-vim.keymap.set('n', '<leader>sD', function()
-  builtin.live_grep {
-    cwd = vim.fn.expand '~/dotfiles',
-    additional_args = function()
-      return {
-         '--hidden',
-    '--follow',
-    '--glob',
-    '!.git/*',
-      }
-    end,
-  }
-end, { desc = '[S]earch [D]otfiles' })
+  -- Grep Search dotfiles
+  vim.keymap.set('n', '<leader>sD', function()
+    builtin.live_grep {
+      cwd = vim.fn.expand '~/dotfiles',
+      additional_args = function()
+        return {
+          '--hidden',
+          '--follow',
+          '--glob',
+          '!.git/*',
+        }
+      end,
+    }
+  end, { desc = '[S]earch [D]otfiles' })
 
   -- Add Telescope-based LSP pickers when an LSP attaches to a buffer.
   -- If you later switch picker plugins, this is where to update these mappings.
@@ -758,18 +757,39 @@ do
   --  See `:help lsp-config` for information about keys and how to configure
   ---@type table<string, vim.lsp.Config>
   local servers = {
-    -- clangd = {},
-    -- gopls = {},
-    -- pyright = {},
-    -- tsc = {},
-    --
-    -- Some languages (like rust) have entire language plugins that can be useful:
-    --    https://github.com/mrcjkb/rustaceanvim
-    --
-    -- But for many setups, the LSP (`rust_analyzer`) will work just fine
-    -- rust_analyzer = {},
+    -- Shell
+    bashls = {},
 
-    stylua = {}, -- Used to format Lua code
+    -- C#
+    roslyn_ls = {},
+
+    -- Python
+    basedpyright = {},
+
+    -- JavaScript / TypeScript
+    vtsls = {},
+
+    -- Web
+    html = {},
+    cssls = {},
+
+    -- Data / config formats
+    jsonls = {},
+    yamlls = {},
+    taplo = {}, -- TOML
+
+    -- Documentation
+    marksman = {}, -- Markdown
+
+    -- Containers
+    dockerls = {},
+    docker_compose_language_service = {},
+
+    -- SQL
+    sqlls = {},
+
+    -- Terraform
+    terraformls = {},
 
     -- Special Lua Config, as recommended by neovim help docs
     lua_ls = {
@@ -829,6 +849,29 @@ do
   local ensure_installed = vim.tbl_keys(servers or {})
   vim.list_extend(ensure_installed, {
     -- You can add other tools here that you want Mason to install
+    -- Shell
+    'shfmt',
+
+    -- Lua
+    'stylua',
+
+    -- C#
+    'csharpier',
+
+    -- Python
+    'ruff',
+
+    -- Web / JS / TS / JSON / YAML / Markdown
+    'prettier',
+
+    -- TOML
+    'taplo',
+
+    -- SQL
+    'sql-formatter',
+
+    -- Terraform
+    'terraform',
   })
 
   require('mason-tool-installer').setup { ensure_installed = ensure_installed }
@@ -848,29 +891,56 @@ do
   vim.pack.add { gh 'stevearc/conform.nvim' }
   require('conform').setup {
     notify_on_error = false,
-    format_on_save = function(bufnr)
-      -- You can specify filetypes to autoformat on save here:
-      local enabled_filetypes = {
-        -- lua = true,
-        -- python = true,
-      }
-      if enabled_filetypes[vim.bo[bufnr].filetype] then
-        return { timeout_ms = 500 }
-      else
-        return nil
-      end
-    end,
+    format_on_save = {
+      timeout_ms = 1000,
+      lsp_format = 'fallback',
+    },
     default_format_opts = {
       lsp_format = 'fallback', -- Use external formatters if configured below, otherwise use LSP formatting. Set to `false` to disable LSP formatting entirely.
     },
     -- You can also specify external formatters in here.
     formatters_by_ft = {
-      -- rust = { 'rustfmt' },
-      -- Conform can also run multiple formatters sequentially
-      -- python = { "isort", "black" },
-      --
-      -- You can use 'stop_after_first' to run the first available formatter from the list
-      -- javascript = { "prettierd", "prettier", stop_after_first = true },
+      -- Shell
+      sh = { 'shfmt' },
+
+      -- Lua
+      lua = { 'stylua' },
+
+      -- C#
+      cs = { 'csharpier' },
+
+      -- Python
+      python = { 'ruff_format' },
+
+      -- JavaScript / TypeScript
+      javascript = { 'prettier' },
+      javascriptreact = { 'prettier' },
+      typescript = { 'prettier' },
+      typescriptreact = { 'prettier' },
+
+      -- Web
+      html = { 'prettier' },
+      css = { 'prettier' },
+      scss = { 'prettier' },
+      less = { 'prettier' },
+
+      -- Data / configuration
+      json = { 'prettier' },
+      jsonc = { 'prettier' },
+      yaml = { 'prettier' },
+      toml = { 'taplo' },
+
+      -- Documentation
+      markdown = { 'prettier' },
+      ['markdown.mdx'] = { 'prettier' },
+
+      -- SQL
+      sql = { 'sql_formatter' },
+
+      -- Terraform / HCL
+      terraform = { 'terraform_fmt' },
+      ['terraform-vars'] = { 'terraform_fmt' },
+      hcl = { 'terraform_fmt' },
     },
   }
 
