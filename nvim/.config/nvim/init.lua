@@ -147,6 +147,12 @@ do
   vim.o.splitright = true
   vim.o.splitbelow = true
 
+  -- Project settings, filetype settings, and guess-indent can override these.
+  vim.o.tabstop = 8
+  vim.o.shiftwidth = 2
+  vim.o.softtabstop = -1
+  vim.o.expandtab = true
+
   -- Sets how neovim will display certain whitespace characters in the editor.
   --  See `:help 'list'`
   --  and `:help 'listchars'`
@@ -208,6 +214,13 @@ do
       end,
     },
   }
+
+  -- Use conventional indentation for languages whose standard differs
+  -- from our 2-space default.
+  vim.api.nvim_create_autocmd('FileType', {
+    pattern = { 'python', 'cs' },
+    callback = function() vim.bo.shiftwidth = 4 end,
+  })
 
   vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open diagnostic [Q]uickfix list' })
 
@@ -353,7 +366,9 @@ do
   -- We first install it from https://github.com/NMAC427/guess-indent.nvim
   -- and then call its `setup()` function to start it with default settings.
   vim.pack.add { gh 'NMAC427/guess-indent.nvim' }
-  require('guess-indent').setup {}
+  require('guess-indent').setup {
+    override_editorconfig = false,
+  }
 
   -- Here is a more advanced configuration example that passes options to `gitsigns.nvim`
   --
