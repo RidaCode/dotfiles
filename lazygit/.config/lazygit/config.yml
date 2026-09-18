@@ -1,0 +1,15 @@
+notARepository: prompt
+
+customCommands:
+  - key: "P"
+    context: "global"
+    description: "Push / publish to GitHub"
+    loadingText: "Pushing..."
+    command: >
+      if git rev-parse --abbrev-ref --symbolic-full-name '@{u}' >/dev/null 2>&1; then
+        git push;
+      elif git remote get-url origin >/dev/null 2>&1; then
+        git push -u origin HEAD;
+      else
+        gh repo create --private --source=. --remote=origin --push;
+      fi
