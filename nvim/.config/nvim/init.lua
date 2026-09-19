@@ -715,6 +715,24 @@ end)
 -- SECTION 6: LSP
 -- LSP keymaps, server configuration, Mason tools installations
 -- ============================================================
+
+-- Lua development support for Neovim plugins
+vim.pack.add {
+  gh 'folke/lazydev.nvim',
+  gh 'LuaCATS/luassert',
+  gh 'LuaCATS/busted',
+}
+
+require('lazydev').setup {
+  library = {
+    { path = 'luassert/library', words = { 'assert' } },
+    {
+      path = 'busted/library',
+      words = { 'describe', 'it', 'before_each', 'after_each' },
+    },
+  },
+}
+
 do
   -- [[ LSP Configuration ]]
   -- Brief aside: **What is LSP?**
