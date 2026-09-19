@@ -523,6 +523,16 @@ end
 -- Telescope setup, keymaps, LSP picker mappings
 -- ============================================================
 do
+  -- [[ Oil - filesystem navigation ]]
+  vim.pack.add { gh 'stevearc/oil.nvim' }
+
+  require('oil').setup()
+
+  -- Open the parent directory of the current file.
+  vim.keymap.set('n', '-', '<cmd>Oil<cr>', {
+    desc = 'Open parent directory',
+  })
+
   -- [[ Fuzzy Finder (files, lsp, etc) ]]
   --
   -- Telescope is a fuzzy finder that comes with a lot of different things that
