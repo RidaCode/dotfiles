@@ -47,6 +47,15 @@ dotfiles() {
 [ -f /usr/share/fzf/shell/key-bindings.zsh ] && source /usr/share/fzf/shell/key-bindings.zsh
 [ -f /usr/share/fzf/shell/completion.zsh ] && source /usr/share/fzf/shell/completion.zsh
 
+# terminal commands flags fzf tab
+autoload -Uz compinit
+compinit
+
+source ~/.local/share/zsh/plugins/fzf-tab/fzf-tab.plugin.zsh
+
+zstyle ':completion:*:descriptions' format '[%d]'
+zstyle ':completion:*' menu no
+
 # zoxide
 eval "$(zoxide init zsh)"
 eval "$(starship init zsh)"
