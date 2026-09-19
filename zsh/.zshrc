@@ -69,5 +69,25 @@ colors
 # Make CMake always generate clangd's database
 export CMAKE_EXPORT_COMPILE_COMMANDS=ON
 
+# command to compile and run temporarly for LearnCpp.com excersices later we will use cmake
+compile() {
+  local src="$1"
+  local out="${src%.cpp}"
+
+  g++ \
+    -std=c++23 \
+    -ggdb \
+    -pedantic-errors \
+    -Wall \
+    -Weffc++ \
+    -Wextra \
+    -Wconversion \
+    -Wsign-conversion \
+    -Werror \
+    "$src" \
+    -o "$out" &&
+  "./$out"
+}
+
 # PROMPT='%F{cyan}%~%f
 # %F{green}❯%f '
