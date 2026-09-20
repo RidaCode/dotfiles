@@ -1,10 +1,10 @@
 notARepository: prompt
 
 customCommands:
-  - key: "P"
+  - key: "<ctrl+g>"
     context: "global"
-    description: "Push / publish to GitHub"
-    loadingText: "Pushing..."
+    description: "Publish to GitHub"
+    loadingText: "Publishing..."
     command: >
       if git rev-parse --abbrev-ref --symbolic-full-name '@{u}' >/dev/null 2>&1; then
         git push;
