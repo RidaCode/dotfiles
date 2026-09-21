@@ -91,3 +91,4 @@ compile() {
 
 # PROMPT='%F{cyan}%~%f
 # %F{green}❯%f '
+export PATH="$HOME/.local/bin:$PATH"
