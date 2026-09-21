@@ -215,11 +215,21 @@ do
     },
   }
 
-  -- Use conventional indentation for languages whose standard differs
-  -- from our 2-space default.
+  -- Use conventional 4-space indentation for these languages.
   vim.api.nvim_create_autocmd('FileType', {
-    pattern = { 'python', 'cs' },
-    callback = function() vim.bo.shiftwidth = 4 end,
+    pattern = { 'python', 'cs', 'c', 'cpp' },
+    callback = function()
+      vim.bo.tabstop = 4
+      vim.bo.shiftwidth = 4
+      vim.bo.softtabstop = -1
+      vim.bo.expandtab = true
+    end,
+  })
+
+  -- C/C++ style guide: keep code around 80 columns.
+  vim.api.nvim_create_autocmd('FileType', {
+    pattern = { 'c', 'cpp' },
+    callback = function() vim.wo.colorcolumn = '80' end,
   })
 
   vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open diagnostic [Q]uickfix list' })
@@ -1070,8 +1080,8 @@ do
     -- You can also specify external formatters in here.
     formatters_by_ft = {
       -- C/C++
-      c = { 'clang_format' },
-      cpp = { 'clang_format' },
+      c = { 'clang-format' },
+      cpp = { 'clang-format' },
 
       -- Shell
       sh = { 'shfmt' },
