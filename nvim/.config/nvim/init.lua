@@ -226,12 +226,6 @@ do
     end,
   })
 
-  -- C/C++ style guide: keep code around 80 columns.
-  vim.api.nvim_create_autocmd('FileType', {
-    pattern = { 'c', 'cpp' },
-    callback = function() vim.wo.colorcolumn = '80' end,
-  })
-
   vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open diagnostic [Q]uickfix list' })
 
   -- Exit terminal mode in the builtin terminal with a shortcut that is a bit easier
