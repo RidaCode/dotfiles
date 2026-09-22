@@ -48,10 +48,8 @@ dotfiles() {
 [ -f /usr/share/fzf/shell/completion.zsh ] && source /usr/share/fzf/shell/completion.zsh
 
 # terminal commands flags fzf tab
-autoload -Uz compinit
-compinit
-
-source ~/.local/share/zsh/plugins/fzf-tab/fzf-tab.plugin.zsh
+[[ -f "$HOME/.local/share/zsh/plugins/fzf-tab/fzf-tab.plugin.zsh" ]] &&
+  source "$HOME/.local/share/zsh/plugins/fzf-tab/fzf-tab.plugin.zsh"
 
 zstyle ':completion:*:descriptions' format '[%d]'
 zstyle ':completion:*' menu no
@@ -60,8 +58,8 @@ zstyle ':completion:*' menu no
 eval "$(zoxide init zsh)"
 eval "$(starship init zsh)"
 
-source /usr/share/zsh-autosuggestions/zsh-autosuggestions.zsh
-source /usr/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+[[ -f /usr/share/zsh-autosuggestions/zsh-autosuggestions.zsh ]] &&
+  source /usr/share/zsh-autosuggestions/zsh-autosuggestions.zsh
 
 autoload -Uz colors
 colors
@@ -91,4 +89,8 @@ compile() {
 
 # PROMPT='%F{cyan}%~%f
 # %F{green}❯%f '
-export PATH="$HOME/.local/bin:$PATH"
+export PATH="$HOME/.local/bin:$HOME/.dotnet/tools:$PATH"
+
+# Keep syntax highlighting last
+[[ -f /usr/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh ]] &&
+  source /usr/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh

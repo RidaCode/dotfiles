@@ -1,9 +1,10 @@
 #!/usr/bin/env bash
 
-set -e
+set -euo pipefail
 
-DOTFILES="$HOME/dotfiles"
+DOTFILES="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 TPM="$HOME/.tmux/plugins/tpm"
+ZSH_PLUGIN_DIR="$HOME/.local/share/zsh/plugins"
 
 echo "==> Installing base tools"
 
@@ -21,7 +22,20 @@ sudo dnf install -y \
   fd-find \
   curl \
   wget \
-  util-linux-user
+  make \
+  unzip \
+  gawk \
+  tree-sitter-cli \
+  nodejs22 \
+  nodejs22-npm \
+  util-linux-user \
+  gcc-c++ \
+  clang-tools-extra \
+  gdb \
+  dotnet-sdk-10.0 \
+  python3-neovim \
+  zsh-autosuggestions \
+  zsh-syntax-highlighting
 
 # ==================================================
 # STARSHIP
@@ -37,6 +51,35 @@ else
 fi
 
 # ==================================================
+# LAZYGIT
+# ==================================================
+
+echo "==> Installing Lazygit"
+
+if ! command -v lazygit >/dev/null 2>&1; then
+  sudo dnf copr enable -y dejan/lazygit
+  sudo dnf install -y lazygit
+else
+  echo "Lazygit already installed"
+fi
+
+# ==================================================
+# ZSH PLUGINS
+# ==================================================
+
+echo "==> Installing Zsh plugins"
+
+mkdir -p "$ZSH_PLUGIN_DIR"
+
+if [[ ! -d "$ZSH_PLUGIN_DIR/fzf-tab/.git" ]]; then
+  git clone https://github.com/Aloxaf/fzf-tab \
+    "$ZSH_PLUGIN_DIR/fzf-tab"
+else
+  echo "fzf-tab already installed"
+  git -C "$ZSH_PLUGIN_DIR/fzf-tab" pull --ff-only
+fi
+
+# ==================================================
 # DOTFILES
 # ==================================================
 
@@ -49,16 +92,20 @@ stow --restow git
 stow --restow tmux
 stow --restow nvim
 stow --restow starship
+stow --restow lazygit
+stow --restow clang-format
+stow --restow clang-tidy
 
 # ==================================================
 # ZSH
 # ==================================================
 
 ZSH_PATH="$(command -v zsh)"
+CURRENT_SHELL="$(getent passwd "$USER" | cut -d: -f7)"
 
-if [[ "$(getent passwd "$USER" | cut -d: -f7)" != "$ZSH_PATH" ]]; then
+if [[ "$CURRENT_SHELL" != "$ZSH_PATH" ]]; then
   echo "==> Setting zsh as login shell"
-  chsh -s "$ZSH_PATH"
+  sudo usermod --shell "$ZSH_PATH" "$USER"
 else
   echo "==> zsh is already the login shell"
 fi
@@ -93,5 +140,4 @@ echo "=========================================="
 echo " Environment setup complete"
 echo "=========================================="
 echo
-echo "Log out and back in if your login shell"
-echo "was changed to zsh."
+echo "Restart your shell or log out and back in."
