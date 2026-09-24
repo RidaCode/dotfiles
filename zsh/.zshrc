@@ -67,6 +67,9 @@ colors
 # Make CMake always generate clangd's database
 export CMAKE_EXPORT_COMPILE_COMMANDS=ON
 
+# Open man pages in Neovim
+export MANPAGER='nvim +Man!'
+
 # command to compile and run temporarly for LearnCpp.com excersices later we will use cmake
 compile() {
   local src="$1"
