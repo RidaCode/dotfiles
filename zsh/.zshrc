@@ -43,6 +43,25 @@ dotfiles() {
   [[ -n "$file" ]] && nvim "$file"
 }
 
+# Search man pages interactively
+mans() {
+  local selection name section
+
+  selection=$(
+    apropos . 2>/dev/null |
+      fzf \
+        --prompt="MAN > " \
+        --border \
+        --reverse \
+        --query="$*"
+  ) || return
+
+  name="${selection%% *}"
+  section=$(printf '%s\n' "$selection" | sed -n 's/.*(\([^)]*\)) *-.*/\1/p')
+
+  man "$section" "$name"
+}
+
 # fzf
 [ -f /usr/share/fzf/shell/key-bindings.zsh ] && source /usr/share/fzf/shell/key-bindings.zsh
 [ -f /usr/share/fzf/shell/completion.zsh ] && source /usr/share/fzf/shell/completion.zsh
