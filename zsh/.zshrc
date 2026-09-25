@@ -23,6 +23,7 @@ alias ll='eza -lah --group-directories-first --icons=auto'
 alias la='eza -a --group-directories-first --icons=auto'
 alias l='eza --group-directories-first --icons=auto'
 alias gs='git status'
+alias cat="bat --paging=never"
 
 #Searching in dotfiles command-line
 dotfiles() {
