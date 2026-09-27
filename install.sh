@@ -10,6 +10,7 @@ echo "==> Installing base tools"
 
 sudo dnf install -y \
   git \
+  gh \
   stow \
   zsh \
   tmux \

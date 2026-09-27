@@ -1,5 +1,14 @@
 [user]
-	name = RidaCode
-	email = abdulredha@live.com
+    name = RidaCode
+    email = abdulredha@live.com
+
 [init]
-	defaultBranch = main
+    defaultBranch = main
+
+[credential "https://github.com"]
+    helper =
+    helper = !gh auth git-credential
+
+[credential "https://gist.github.com"]
+    helper =
+    helper = !gh auth git-credential
