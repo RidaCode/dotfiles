@@ -1295,7 +1295,42 @@ do
   local dap = require 'dap'
   local dapui = require 'dapui'
 
-  dapui.setup {}
+  dapui.setup {
+    -- Don't horizontally clip long variable names / values.
+    wrap = true,
+
+    layouts = {
+      {
+        elements = {
+          { id = 'scopes', size = 0.40 },
+          { id = 'stacks', size = 0.25 },
+          { id = 'breakpoints', size = 0.20 },
+          { id = 'watches', size = 0.15 },
+        },
+        size = 55,
+        position = 'left',
+      },
+
+      {
+        elements = {
+          { id = 'repl', size = 1.0 },
+        },
+        size = 12,
+        position = 'bottom',
+      },
+    },
+
+    floating = {
+      border = 'rounded',
+      max_height = 0.8,
+      max_width = 0.8,
+    },
+
+    render = {
+      indent = 1,
+      max_value_lines = 100,
+    },
+  }
 
   require('nvim-dap-virtual-text').setup {}
 
