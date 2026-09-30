@@ -279,6 +279,9 @@ vim.api.nvim_create_autocmd('FileType', {
   end,
 })
 
+-- current working directory to the directory of the active file for the current window only
+vim.keymap.set('n', '<leader>cd', '<cmd>cd %:p:h<cr>', { desc = 'Change directory to current file' })
+
 -- ============================================================
 -- SECTION 3: PLUGIN MANAGER INTRO
 -- vim.pack intro, build hooks
