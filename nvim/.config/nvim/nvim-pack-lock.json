@@ -66,6 +66,11 @@
       "rev": "cc9dd33aade7f20bae414d0cba163bc60d4d4b43",
       "src": "https://github.com/rcarriga/nvim-dap-ui"
     },
+    "nvim-dap-view": {
+      "rev": "210b2c0e4acc08aad23fbd5a7989dd0169f716d0",
+      "src": "https://github.com/igorlfs/nvim-dap-view",
+      "version": "1.0.0 - 2.0.0"
+    },
     "nvim-dap-virtual-text": {
       "rev": "fbdb48c2ed45f4a8293d0d483f7730d24467ccb6",
       "src": "https://github.com/theHamsta/nvim-dap-virtual-text"

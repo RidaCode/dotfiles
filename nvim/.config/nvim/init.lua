@@ -447,6 +447,9 @@ do
       { '<leader>d', group = '[D]ebug' },
       { 'gr', group = 'LSP Actions', mode = { 'n' } },
     },
+    win = {
+      no_overlap = false,
+    },
   }
 
   -- [[ Colorscheme ]]
@@ -1282,53 +1285,34 @@ end
 
 -- ============================================================
 -- SECTION 11: DEBUGGING
--- nvim-dap, GDB, debugger UI
+-- nvim-dap, GDB, dap-view
 -- ============================================================
 do
   vim.pack.add {
     gh 'mfussenegger/nvim-dap',
-    gh 'nvim-neotest/nvim-nio',
-    gh 'rcarriga/nvim-dap-ui',
+    { src = gh 'igorlfs/nvim-dap-view', version = vim.version.range '1.*' },
     gh 'theHamsta/nvim-dap-virtual-text',
   }
 
   local dap = require 'dap'
-  local dapui = require 'dapui'
+  local dapview = require 'dap-view'
 
-  dapui.setup {
-    -- Don't horizontally clip long variable names / values.
-    wrap = true,
+  dapview.setup {
+    auto_toggle = true,
 
-    layouts = {
-      {
-        elements = {
-          { id = 'scopes', size = 0.40 },
-          { id = 'stacks', size = 0.25 },
-          { id = 'breakpoints', size = 0.20 },
-          { id = 'watches', size = 0.15 },
-        },
-        size = 55,
-        position = 'left',
-      },
-
-      {
-        elements = {
-          { id = 'repl', size = 1.0 },
-        },
-        size = 12,
-        position = 'bottom',
+    winbar = {
+      controls = {
+        enabled = true,
       },
     },
 
-    floating = {
+    windows = {
+      position = 'above',
+      size = 0.30,
+    },
+
+    hover = {
       border = 'rounded',
-      max_height = 0.8,
-      max_width = 0.8,
-    },
-
-    render = {
-      indent = 1,
-      max_value_lines = 100,
     },
   }
 
@@ -1373,15 +1357,6 @@ do
   dap.configurations.cpp = cpp_configurations
   dap.configurations.c = cpp_configurations
 
-  -- Automatically show the debugger UI while debugging.
-  dap.listeners.before.attach.dapui_config = function() dapui.open() end
-
-  dap.listeners.before.launch.dapui_config = function() dapui.open() end
-
-  dap.listeners.before.event_terminated.dapui_config = function() dapui.close() end
-
-  dap.listeners.before.event_exited.dapui_config = function() dapui.close() end
-
   -- Debugger keymaps.
   vim.keymap.set('n', '<leader>db', dap.toggle_breakpoint, {
     desc = '[D]ebug [B]reakpoint',
@@ -1411,20 +1386,28 @@ do
     desc = '[D]ebug [T]erminate',
   })
 
-  vim.keymap.set('n', '<leader>dr', dap.repl.open, {
-    desc = '[D]ebug [R]EPL',
-  })
-
   vim.keymap.set('n', '<leader>dl', dap.run_last, {
     desc = '[D]ebug run [L]ast',
   })
 
-  vim.keymap.set('n', '<leader>du', dapui.toggle, {
+  -- Toggle the entire debugger view.
+  vim.keymap.set('n', '<leader>du', dapview.toggle, {
     desc = '[D]ebug [U]I',
   })
 
-  vim.keymap.set({ 'n', 'v' }, '<leader>de', dapui.eval, {
+  -- Inspect/evaluate the variable under the cursor.
+  vim.keymap.set({ 'n', 'v' }, '<leader>de', dapview.hover, {
     desc = '[D]ebug [E]valuate',
+  })
+
+  -- Jump directly to the integrated REPL.
+  vim.keymap.set('n', '<leader>dr', function() dapview.jump_to_view 'repl' end, {
+    desc = '[D]ebug [R]EPL',
+  })
+
+  -- Add expression under cursor / selection to watches.
+  vim.keymap.set({ 'n', 'v' }, '<leader>dw', dapview.add_expr, {
+    desc = '[D]ebug [W]atch expression',
   })
 end
 
