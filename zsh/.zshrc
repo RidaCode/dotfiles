@@ -84,6 +84,26 @@ eval "$(starship init zsh)"
 autoload -Uz colors
 colors
 
+# obs scenes commands
+brb() {
+  local reason="${*:-be right back}"
+
+  python3 -c '
+import json, sys
+
+reason = sys.argv[1]
+
+with open("/home/rida/.config/obs/brb/reason.js", "w") as f:
+    f.write("window.BRB_REASON = " + json.dumps(reason) + ";\n")
+' "$reason"
+
+  obsws-cli scene switch BRB >/dev/null
+}
+
+back() {
+  obsws-cli scene switch MAIN >/dev/null
+}
+
 # Make CMake always generate clangd's database
 export CMAKE_EXPORT_COMPILE_COMMANDS=ON
 
