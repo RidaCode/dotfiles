@@ -1370,6 +1370,8 @@ do
     desc = '[D]ebug [C]ontinue',
   })
 
+  vim.keymap.set('n', '<leader>dC', function() dap.run_to_cursor() end, { desc = 'Run to Cursor' })
+
   vim.keymap.set('n', '<leader>dn', dap.step_over, {
     desc = '[D]ebug [N]ext / step over',
   })
