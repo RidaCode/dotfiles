@@ -452,6 +452,11 @@ do
     },
   }
 
+  -- Show current file / class / function as breadcrumbs in the winbar.
+  vim.pack.add { gh 'Bekaboo/dropbar.nvim' }
+
+  require('dropbar').setup {}
+
   -- [[ Colorscheme ]]
   -- You can easily change to a different colorscheme.
   -- Change the name of the colorscheme plugin below, and then
@@ -510,6 +515,17 @@ do
 
   -- Add better jumping capabilities with f, it repeats
   require('mini.jump').setup()
+
+  -- Highlight the current indentation scope.
+  local indentscope = require 'mini.indentscope'
+
+  indentscope.setup {
+    symbol = '│',
+
+    draw = {
+      animation = indentscope.gen_animation.none(),
+    },
+  }
 
   -- Simple and easy statusline.
   --  You could remove this setup call if you don't like it,
@@ -1194,6 +1210,12 @@ do
 
   -- NOTE: You can also specify a branch or a specific commit
   vim.pack.add { { src = gh 'nvim-treesitter/nvim-treesitter', version = 'main' } }
+
+  vim.pack.add { gh 'nvim-treesitter/nvim-treesitter-context' }
+
+  require('treesitter-context').setup {
+    max_lines = 3,
+  }
 
   -- Ensure basic parsers are installed
   local parsers = { 'bash', 'c', 'cpp', 'diff', 'html', 'lua', 'luadoc', 'markdown', 'markdown_inline', 'query', 'vim', 'vimdoc' }
