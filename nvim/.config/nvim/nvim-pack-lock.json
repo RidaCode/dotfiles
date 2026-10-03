@@ -18,6 +18,10 @@
       "rev": "5ed85d0e016a5eb5eca097aa52905eedf1b180f1",
       "src": "https://github.com/LuaCATS/busted"
     },
+    "colorful-menu.nvim": {
+      "rev": "196ddf16d5f8fec09ba7f20e6b153aa5188e907b",
+      "src": "https://github.com/xzbdmw/colorful-menu.nvim"
+    },
     "conform.nvim": {
       "rev": "016802de402556da54c36bd7359b441266b01cdd",
       "src": "https://github.com/stevearc/conform.nvim"

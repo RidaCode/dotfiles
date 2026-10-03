@@ -842,6 +842,25 @@ do
       --  For example, in C this would take you to the header.
       map('grD', vim.lsp.buf.declaration, '[G]oto [D]eclaration')
 
+      vim.keymap.set(
+        'n',
+        'K',
+        function()
+          vim.lsp.buf.hover {
+            border = 'rounded',
+            max_width = 100,
+            max_height = 30,
+            title = ' Documentation ',
+            title_pos = 'center',
+            wrap = true,
+          }
+        end,
+        {
+          buffer = event.buf,
+          desc = 'LSP: Hover Documentation',
+        }
+      )
+
       -- The following two autocommands are used to highlight references of the
       -- word under your cursor when your cursor rests there for a little while.
       --    See `:help CursorHold` for information about when this is executed
@@ -1193,9 +1212,80 @@ do
     },
 
     completion = {
+      menu = {
+        border = 'rounded',
+        max_height = 15,
+
+        draw = {
+          padding = 1,
+          gap = 2,
+
+          columns = {
+            { 'kind_icon' },
+            { 'label', gap = 1 },
+            { 'kind' },
+          },
+
+          components = {
+            kind_icon = {
+              text = function(ctx)
+                local icon = require('mini.icons').get('lsp', ctx.kind)
+                return icon
+              end,
+
+              highlight = function(ctx)
+                local _, hl = require('mini.icons').get('lsp', ctx.kind)
+                return hl
+              end,
+            },
+
+            label = {
+              width = {
+                fill = true,
+                min = 30,
+                max = 80,
+              },
+
+              text = function(ctx) return require('colorful-menu').blink_components_text(ctx) end,
+
+              highlight = function(ctx) return require('colorful-menu').blink_components_highlight(ctx) end,
+            },
+
+            kind = {
+              width = { min = 10, max = 14 },
+
+              highlight = function(ctx)
+                local _, hl = require('mini.icons').get('lsp', ctx.kind)
+                return hl
+              end,
+            },
+          },
+        },
+      },
       documentation = {
         auto_show = true,
-        auto_show_delay_ms = 200,
+        auto_show_delay_ms = 100,
+        update_delay_ms = 50,
+        treesitter_highlighting = true,
+
+        window = {
+          border = 'rounded',
+
+          min_width = 60,
+          max_width = 120,
+          max_height = 30,
+
+          scrollbar = true,
+
+          direction_priority = {
+            menu_north = { 'n', 's', 'e', 'w' },
+            menu_south = { 's', 'n', 'e', 'w' },
+          },
+        },
+      },
+
+      ghost_text = {
+        enabled = true,
       },
     },
 
@@ -1210,6 +1300,17 @@ do
     signature = { enabled = true },
   }
 end
+
+vim.pack.add { gh 'xzbdmw/colorful-menu.nvim' }
+
+require('colorful-menu').setup {
+  ls = {
+    clangd = {
+      extra_info_hl = '@comment',
+      align_type_to_right = true,
+    },
+  },
+}
 
 -- ============================================================
 -- SECTION 9: TREESITTER
