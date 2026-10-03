@@ -495,13 +495,13 @@ do
   --
   -- Examples:
   --  - va)  - [V]isually select [A]round [)]paren
-  --  - yiiq - [Y]ank [I]nside [I]+1 [Q]uote
+  --  - yinq - [Y]ank [I]nside [N]ext [Q]uote
   --  - ci'  - [C]hange [I]nside [']quote
   require('mini.ai').setup {
     -- NOTE: Avoid conflicts with the built-in incremental selection mappings on Neovim>=0.12 (see `:help treesitter-incremental-selection`)
     mappings = {
       around_next = 'aa',
-      inside_next = 'ii',
+      inside_next = 'in',
     },
     n_lines = 500,
   }
@@ -516,11 +516,24 @@ do
   -- Add better jumping capabilities with f, it repeats
   require('mini.jump').setup()
 
-  -- Highlight the current indentation scope.
+  -- Show persistent indentation guides; current indentation region is highlighted separately.
+  vim.pack.add { gh 'lukas-reineke/indent-blankline.nvim' }
+
+  require('ibl').setup {
+    indent = {
+      char = '│',
+    },
+
+    scope = {
+      enabled = false,
+    },
+  }
+
+  -- Highlight the current indentation region.
   local indentscope = require 'mini.indentscope'
 
   indentscope.setup {
-    symbol = '│',
+    symbol = '┃',
 
     draw = {
       animation = indentscope.gen_animation.none(),
