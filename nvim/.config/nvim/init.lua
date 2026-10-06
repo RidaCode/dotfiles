@@ -236,6 +236,37 @@ do
   -- or just use <C-\><C-n> to exit terminal mode
   vim.keymap.set('t', '<Esc><Esc>', '<C-\\><C-n>', { desc = 'Exit terminal mode' })
 
+  -- Compile and run the current C++ file in a clean bottom terminal
+  vim.keymap.set('n', '<leader>r', function()
+    vim.cmd 'write'
+
+    local dir = vim.fn.shellescape(vim.fn.expand '%:p:h')
+    local file = vim.fn.shellescape(vim.fn.expand '%:t')
+    local output = vim.fn.shellescape(vim.fn.expand '%:t:r')
+
+    vim.cmd 'belowright 12split'
+
+    local cmd = table.concat({
+      'cd ' .. dir,
+      '&& g++',
+      '-std=c++23',
+      '-fdiagnostics-color=always',
+      '-Wall',
+      '-Wextra',
+      '-Wpedantic',
+      file,
+      '-o',
+      output,
+      '&& ./' .. output,
+    }, ' ')
+
+    vim.cmd('terminal ' .. cmd)
+
+    vim.wo.winbar = ''
+
+    vim.cmd 'startinsert'
+  end, { desc = '[R]un current C++ file' })
+
   -- TIP: Disable arrow keys in normal mode
   -- vim.keymap.set('n', '<left>', '<cmd>echo "Use h to move!!"<CR>')
   -- vim.keymap.set('n', '<right>', '<cmd>echo "Use l to move!!"<CR>')
@@ -437,7 +468,7 @@ do
   vim.pack.add { gh 'folke/which-key.nvim' }
   require('which-key').setup {
     -- Delay between pressing a key and opening which-key (milliseconds)
-    delay = 300,
+    delay = 500,
     icons = { mappings = vim.g.have_nerd_font },
     -- Document existing key chains
     spec = {
@@ -455,7 +486,30 @@ do
   -- Show current file / class / function as breadcrumbs in the winbar.
   vim.pack.add { gh 'Bekaboo/dropbar.nvim' }
 
-  require('dropbar').setup {}
+  require('dropbar').setup {
+    bar = {
+      enable = function(buf, win, _)
+        buf = vim._resolve_bufnr(buf)
+
+        if not vim.api.nvim_buf_is_valid(buf) or not vim.api.nvim_win_is_valid(win) then return false end
+
+        -- Don't show Dropbar in terminal windows
+        if vim.bo[buf].buftype == 'terminal' then return false end
+
+        if vim.fn.win_gettype(win) ~= '' or vim.wo[win].winbar ~= '' or vim.bo[buf].ft == 'help' then return false end
+
+        local stat = vim.uv.fs_stat(vim.api.nvim_buf_get_name(buf))
+        if stat and stat.size > 1024 * 1024 then return false end
+
+        return vim.bo[buf].ft == 'markdown'
+          or pcall(vim.treesitter.get_parser, buf)
+          or not vim.tbl_isempty(vim.lsp.get_clients {
+            bufnr = buf,
+            method = 'textDocument/documentSymbol',
+          })
+      end,
+    },
+  }
 
   -- [[ Colorscheme ]]
   -- You can easily change to a different colorscheme.
@@ -565,7 +619,15 @@ do
   -- [[ Oil - filesystem navigation ]]
   vim.pack.add { gh 'stevearc/oil.nvim' }
 
-  require('oil').setup()
+  require('oil').setup {
+    view_options = {
+      -- Show files and directories that start with "."
+      show_hidden = true,
+      -- Optional: You can hide specific files like ".." or ".git"
+      -- so they don't clutter your view while keeping other dotfiles visible.
+      is_always_hidden = function(name, bufnr) return name == '..' or name == '.git' end,
+    },
+  }
 
   -- Open the parent directory of the current file.
   vim.keymap.set('n', '-', '<cmd>Oil<cr>', {
@@ -1174,6 +1236,12 @@ do
       hcl = { 'terraform_fmt' },
     },
   }
+
+  -- Prevent adding new comment new line with o/O
+  vim.api.nvim_create_autocmd('FileType', {
+    pattern = '*',
+    callback = function() vim.opt_local.formatoptions:remove 'o' end,
+  })
 
   vim.keymap.set({ 'n', 'v' }, '<leader>f', function() require('conform').format { async = true } end, { desc = '[F]ormat buffer' })
 end
