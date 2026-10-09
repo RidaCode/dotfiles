@@ -192,31 +192,35 @@ do
 
   -- Clear highlights on search when pressing <Esc> in normal mode
   --  See `:help hlsearch`
-  vim.keymap.set('n', '<Esc>', '<cmd>nohlsearch<CR>')
+  -- Escape dismisses floating windows and clears search highlights.
+  vim.keymap.set('n', '<Esc>', function()
+    vim.cmd 'nohlsearch'
 
-  -- Diagnostic Config & Keymaps
-  --  See `:help vim.diagnostic.Opts`
+    for _, win in ipairs(vim.api.nvim_tabpage_list_wins(0)) do
+      local config = vim.api.nvim_win_get_config(win)
+
+      if config.relative ~= '' then vim.api.nvim_win_close(win, true) end
+    end
+  end, { desc = 'Dismiss floating windows' })
+
+  -- On-demand LSP philosophy
+  -- Inspired by advice from ZedAShaw: https://www.twitch.tv/zedashaw
+  --
+  -- Keep the editor distraction-free while learning and writing code.
+  -- Diagnostics and LSP assistance remain available, but only appear
+  -- when explicitly requested, encouraging independent problem-solving.
   vim.diagnostic.config {
     update_in_insert = false,
     severity_sort = true,
-    float = { border = 'rounded', source = 'if_many' },
-    underline = { severity = { min = vim.diagnostic.severity.WARN } },
-
-    -- Can switch between these as you prefer
-    virtual_text = false, -- Text shows up at the end of the line
-    virtual_lines = false, -- Text shows up underneath the line, with virtual lines
-
-    -- Auto open the float, so you can easily read the errors when jumping with `[d` and `]d`
-    jump = {
-      on_jump = function(_, bufnr)
-        vim.diagnostic.open_float {
-          bufnr = bufnr,
-          scope = 'cursor',
-          focus = false,
-        }
-      end,
-    },
+    signs = false,
+    underline = false,
+    virtual_text = false,
+    virtual_lines = false,
+    float = { border = 'rounded', source = 'if_many', max_width = 90 },
   }
+
+  -- Show diagnostics for the entire cursor line only when requested.
+  vim.keymap.set('n', '<leader>e', function() vim.diagnostic.open_float { scope = 'line', focus = false } end, { desc = 'Show line diagnostics' })
 
   -- Use conventional 4-space indentation for these languages.
   vim.api.nvim_create_autocmd('FileType', {
@@ -898,10 +902,6 @@ do
   -- If you're wondering about lsp vs treesitter, you can check out the wonderfully
   -- and elegantly composed help section, `:help lsp-vs-treesitter`
 
-  -- Useful status updates for LSP.
-  vim.pack.add { gh 'j-hui/fidget.nvim' }
-  require('fidget').setup {}
-
   --  This function gets run when an LSP attaches to a particular buffer.
   --    That is to say, every time a new file is opened that is associated with
   --    an lsp (for example, opening `main.rs` is associated with `rust_analyzer`) this
@@ -950,34 +950,8 @@ do
         }
       )
 
-      -- The following two autocommands are used to highlight references of the
-      -- word under your cursor when your cursor rests there for a little while.
-      --    See `:help CursorHold` for information about when this is executed
-      --
-      -- When you move your cursor, the highlights will be cleared (the second autocommand).
+      -- LSP remains active, without automatic reference highlighting.
       local client = vim.lsp.get_client_by_id(event.data.client_id)
-      if client and client:supports_method('textDocument/documentHighlight', event.buf) then
-        local highlight_augroup = vim.api.nvim_create_augroup('kickstart-lsp-highlight', { clear = false })
-        vim.api.nvim_create_autocmd({ 'CursorHold', 'CursorHoldI' }, {
-          buffer = event.buf,
-          group = highlight_augroup,
-          callback = vim.lsp.buf.document_highlight,
-        })
-
-        vim.api.nvim_create_autocmd({ 'CursorMoved', 'CursorMovedI' }, {
-          buffer = event.buf,
-          group = highlight_augroup,
-          callback = vim.lsp.buf.clear_references,
-        })
-
-        vim.api.nvim_create_autocmd('LspDetach', {
-          group = vim.api.nvim_create_augroup('kickstart-lsp-detach', { clear = true }),
-          callback = function(event2)
-            vim.lsp.buf.clear_references()
-            vim.api.nvim_clear_autocmds { group = 'kickstart-lsp-highlight', buffer = event2.buf }
-          end,
-        })
-      end
 
       -- The following code creates a keymap to toggle inlay hints in your
       -- code, if the language server you are using supports them
@@ -1183,21 +1157,6 @@ vim.keymap.set({ 'n', 'x' }, '<leader>ca', function() require('tiny-code-action'
   desc = '[C]ode [A]ction',
 })
 
--- Better inline diagnostic display.
-vim.pack.add {
-  gh 'rachartier/tiny-inline-diagnostic.nvim',
-}
-
-require('tiny-inline-diagnostic').setup {
-  preset = 'simple',
-  transparent_cursorline = false,
-  options = {
-    multilines = {
-      enabled = true,
-    },
-  },
-}
-
 -- ============================================================
 -- SECTION 7: FORMATTING
 -- conform.nvim setup and keymap
@@ -1308,6 +1267,7 @@ do
 
     completion = {
       menu = {
+        auto_show = false,
         border = 'rounded',
         max_height = 15,
 
@@ -1358,7 +1318,7 @@ do
         },
       },
       documentation = {
-        auto_show = true,
+        auto_show = false,
         auto_show_delay_ms = 100,
         update_delay_ms = 50,
         treesitter_highlighting = true,
@@ -1380,7 +1340,7 @@ do
       },
 
       ghost_text = {
-        enabled = true,
+        enabled = false,
       },
     },
 
@@ -1392,7 +1352,10 @@ do
 
     fuzzy = { implementation = 'lua' },
 
-    signature = { enabled = true },
+    signature = {
+      enabled = true,
+      trigger = { enabled = false },
+    },
   }
 end
 
