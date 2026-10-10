@@ -495,6 +495,30 @@ do
 
   require('dropbar').setup {
     bar = {
+      -- Show filename only, without parent directories.
+      sources = function(buf, _)
+        local sources = require 'dropbar.sources'
+        local utils = require 'dropbar.utils'
+
+        local filename = {
+          get_symbols = function(b, w, cursor)
+            local symbols = sources.path.get_symbols(b, w, cursor)
+            local last = symbols[#symbols]
+            return last and { last } or {}
+          end,
+        }
+
+        if vim.bo[buf].filetype == 'markdown' then return { filename, sources.markdown } end
+
+        return {
+          filename,
+          utils.source.fallback {
+            sources.lsp,
+            sources.treesitter,
+          },
+        }
+      end,
+
       enable = function(buf, win, _)
         buf = vim._resolve_bufnr(buf)
 
