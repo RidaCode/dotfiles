@@ -112,6 +112,9 @@ do
   --  Experiment for yourself to see if you like it!
   vim.o.relativenumber = true
 
+  -- Show absolute:relative line numbers side by side
+  vim.o.statuscolumn = '%s%=%{v:virtnum == 0 ? printf("%4d:%-2d ", v:lnum, v:relnum) : ""}'
+
   -- cursor freely moving around the screen
   vim.opt.virtualedit = 'all'
 
