@@ -246,12 +246,11 @@ do
   -- or just use <C-\><C-n> to exit terminal mode
   vim.keymap.set('t', '<Esc><Esc>', '<C-\\><C-n>', { desc = 'Exit terminal mode' })
 
-  -- Compile and run the current C++ file in a clean bottom terminal
+  -- Compile and run all C++ files in the current directory
   vim.keymap.set('n', '<leader>r', function()
     vim.cmd 'write'
 
     local dir = vim.fn.shellescape(vim.fn.expand '%:p:h')
-    local file = vim.fn.shellescape(vim.fn.expand '%:t')
     local output = vim.fn.shellescape(vim.fn.expand '%:t:r')
 
     vim.cmd 'belowright 12split'
@@ -264,7 +263,7 @@ do
       '-Wall',
       '-Wextra',
       '-Wpedantic',
-      file,
+      '*.cpp',
       '-o',
       output,
       '&& ./' .. output,
@@ -275,7 +274,7 @@ do
     vim.wo.winbar = ''
 
     vim.cmd 'startinsert'
-  end, { desc = '[R]un current C++ file' })
+  end, { desc = '[R]un all C++ files' })
 
   -- TIP: Disable arrow keys in normal mode
   -- vim.keymap.set('n', '<left>', '<cmd>echo "Use h to move!!"<CR>')
