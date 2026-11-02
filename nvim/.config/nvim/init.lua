@@ -246,17 +246,16 @@ do
   -- or just use <C-\><C-n> to exit terminal mode
   vim.keymap.set('t', '<Esc><Esc>', '<C-\\><C-n>', { desc = 'Exit terminal mode' })
 
-  -- Compile and run all C++ files in the current directory
-  vim.keymap.set('n', '<leader>r', function()
+  -- Compile and run C++ files in an ignored .build directory
+  local function compile_and_run_cpp(use_raylib)
     vim.cmd 'write'
 
     local dir = vim.fn.shellescape(vim.fn.expand '%:p:h')
-    local output = vim.fn.shellescape(vim.fn.expand '%:t:r')
+    local output = vim.fn.shellescape('./.build/' .. vim.fn.expand '%:t:r')
 
-    vim.cmd 'belowright 12split'
-
-    local cmd = table.concat({
+    local cmd = {
       'cd ' .. dir,
+      '&& mkdir -p .build',
       '&& g++',
       '-std=c++23',
       '-g',
@@ -269,15 +268,24 @@ do
       '*.cpp',
       '-o',
       output,
-      '&& ./' .. output,
-    }, ' ')
+    }
 
-    vim.cmd('terminal ' .. cmd)
+    if use_raylib then table.insert(cmd, '-lraylib') end
+
+    table.insert(cmd, '&& ' .. output)
+
+    vim.cmd 'belowright 12split'
+    vim.cmd('terminal ' .. table.concat(cmd, ' '))
 
     vim.wo.winbar = ''
-
     vim.cmd 'startinsert'
-  end, { desc = '[R]un all C++ files' })
+  end
+
+  -- Regular C++
+  vim.keymap.set('n', '<leader>r', function() compile_and_run_cpp(false) end, { desc = '[R]un all C++ files' })
+
+  -- C++ with raylib
+  vim.keymap.set('n', '<leader>R', function() compile_and_run_cpp(true) end, { desc = '[R]un all C++ files with raylib' })
 
   -- TIP: Disable arrow keys in normal mode
   -- vim.keymap.set('n', '<left>', '<cmd>echo "Use h to move!!"<CR>')
