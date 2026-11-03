@@ -262,6 +262,7 @@ do
       '-O0',
       '-fdiagnostics-color=always',
       '-Wall',
+      '-Werror',
       '-Wextra',
       '-Wpedantic',
       '-Wconversion',
