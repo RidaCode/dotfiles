@@ -1573,9 +1573,14 @@ do
       type = 'gdb',
       request = 'launch',
 
-      program = function() return vim.fn.input('Path to executable: ', vim.fn.getcwd() .. '/', 'file') end,
+      program = function()
+        local dir = vim.fn.expand '%:p:h'
+        local name = vim.fn.expand '%:t:r'
 
-      cwd = '${workspaceFolder}',
+        return dir .. '/.build/' .. name
+      end,
+
+      cwd = function() return vim.fn.expand '%:p:h' end,
       stopAtBeginningOfMainSubprogram = false,
     },
 
@@ -1584,11 +1589,16 @@ do
       type = 'gdb',
       request = 'attach',
 
-      program = function() return vim.fn.input('Path to executable: ', vim.fn.getcwd() .. '/', 'file') end,
+      program = function()
+        local dir = vim.fn.expand '%:p:h'
+        local name = vim.fn.expand '%:t:r'
+
+        return dir .. '/.build/' .. name
+      end,
 
       pid = function() return require('dap.utils').pick_process() end,
 
-      cwd = '${workspaceFolder}',
+      cwd = function() return vim.fn.expand '%:p:h' end,
     },
   }
 
