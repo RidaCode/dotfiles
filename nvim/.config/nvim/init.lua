@@ -295,6 +295,17 @@ do
   -- C++ with raylib
   vim.keymap.set('n', '<leader>R', function() compile_and_run_cpp(true) end, { desc = '[R]un all C++ files with raylib' })
 
+  -- Remove all comments in C++ files
+  vim.api.nvim_create_user_command('DC', function()
+    if vim.bo.filetype ~= 'cpp' then
+      vim.notify('This command only supports C++ file', vim.log.level.WARN)
+      return
+    end
+
+    vim.cmd [[%s@//.*$@@ge]]
+    vim.cmd [[%s@/\*\_.\{-}\*/@@ge]]
+  end, { desc = 'Remove all C++ comments' })
+
   -- TIP: Disable arrow keys in normal mode
   -- vim.keymap.set('n', '<left>', '<cmd>echo "Use h to move!!"<CR>')
   -- vim.keymap.set('n', '<right>', '<cmd>echo "Use l to move!!"<CR>')
