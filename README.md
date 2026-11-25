@@ -10,6 +10,7 @@ Designed for Fedora Linux and Fedora WSL.
 - Git
 - tmux
 - Neovim
+- Ghostty
 - Starship
 - Lazygit
 - clang-format
@@ -123,6 +124,12 @@ Neovim manages most editor-specific language tooling through Mason.
 
 System-level tools such as `clangd`, `clang-format`, `clang-tidy`, and GDB are installed by `install.sh`.
 
+## Ghostty
+
+The repository manages the Ghostty terminal configuration, including custom shaders, themes, and keybindings.
+
+Ghostty itself is installed separately.
+
 ## Install
 
 ### 1. Clone the repository
@@ -175,6 +182,7 @@ The installer is intended to be idempotent, so rerunning it will update or reuse
 dotfiles/
 ├── clang-format/
 ├── clang-tidy/
+├── ghostty/
 ├── git/
 ├── lazygit/
 ├── nvim/

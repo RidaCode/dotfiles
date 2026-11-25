@@ -92,6 +92,7 @@ stow --restow zsh
 stow --restow git
 stow --restow tmux
 stow --restow nvim
+stow --restow ghostty
 stow --restow starship
 stow --restow lazygit
 stow --restow clang-format
