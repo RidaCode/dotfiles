@@ -327,6 +327,14 @@ do
   -- vim.keymap.set("n", "<C-S-j>", "<C-w>J", { desc = "Move window to the lower" })
   -- vim.keymap.set("n", "<C-S-k>", "<C-w>K", { desc = "Move window to the upper" })
 
+  -- Move current line up/down
+  vim.keymap.set('n', '<C-Up>', '<cmd>m -2<cr>==', { desc = 'Move line up' })
+  vim.keymap.set('n', '<C-Down>', '<cmd>m +1<cr>==', { desc = 'Move line down' })
+
+  -- Move selected lines up/down
+  vim.keymap.set('x', '<C-Up>', ":m '<-2<cr>gv=gv", { desc = 'Move selected lines up' })
+  vim.keymap.set('x', '<C-Down>', ":m '>+1<cr>gv=gv", { desc = 'Move selected lines down' })
+
   -- [[ Basic Autocommands ]]
   --  See `:help lua-guide-autocommands`
 
