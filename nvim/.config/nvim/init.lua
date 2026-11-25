@@ -296,7 +296,7 @@ do
   vim.keymap.set('n', '<leader>R', function() compile_and_run_cpp(true) end, { desc = '[R]un all C++ files with raylib' })
 
   -- Remove all comments in C++ files
-  vim.api.nvim_create_user_command('DC', function()
+  vim.api.nvim_create_user_command('Dca', function()
     if vim.bo.filetype ~= 'cpp' then
       vim.notify('This command only supports C++ file', vim.log.level.WARN)
       return
