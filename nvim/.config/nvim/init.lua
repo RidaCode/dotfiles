@@ -1421,6 +1421,38 @@ do
 
     sources = {
       default = { 'lsp', 'path', 'snippets', 'buffer' },
+
+      providers = {
+        lsp = {
+          -- Prefer brace initialization for C++ member initializers.
+          transform_items = function(_, items)
+            if vim.bo.filetype ~= 'cpp' then return items end
+
+            local kind = vim.lsp.protocol.CompletionItemKind
+
+            for _, item in ipairs(items) do
+              if item.client_name == 'clangd' and item.kind == kind.Field then
+                local text = item.textEdit and item.textEdit.newText or item.insertText
+
+                if text then
+                  local name = text:match '^([%w_]+)%(%$0%)$' or text:match '^([%w_]+)%(%)$'
+
+                  if name then
+                    local replacement = name .. '{$0}'
+
+                    item.insertTextFormat = vim.lsp.protocol.InsertTextFormat.Snippet
+                    item.insertText = replacement
+
+                    if item.textEdit then item.textEdit.newText = replacement end
+                  end
+                end
+              end
+            end
+
+            return items
+          end,
+        },
+      },
     },
 
     snippets = { preset = 'luasnip' },
